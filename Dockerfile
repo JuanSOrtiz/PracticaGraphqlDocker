@@ -8,4 +8,4 @@ RUN mvn clean package -DskipTests
 FROM openjdk:11-jre-slim
 COPY --from=build /app/target/graphqludea-0.0.1-SNAPSHOT.jar /usr/local/lib/graphqludea.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/usr/local/lib/grahqludea.jar"]
+ENTRYPOINT ["java", "-jar", "/usr/local/lib/graphqludea.jar"]

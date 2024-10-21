@@ -1,28 +1,32 @@
 version: '3.8'
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_container
+  postgres:
+    image: postgres:13
+    container_name: postgres_container
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: graphudea
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: vueloudea
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vueloudea"]
       interval: 10s
-      retries: 3
+      timeout: 5s
+      retries: 5
+
   graphqludea:
     build: .
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      postgres:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/graphudea
-      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vueloudea
+      SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
 
   prometheus:
@@ -38,5 +42,6 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+
 volumes:
-  mysql-data:
+  postgres-data:
